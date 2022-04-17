@@ -11,7 +11,9 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import io.security.corespringsecurity.security.common.AjaxLoginAuthenticationEntryPoint;
 import io.security.corespringsecurity.security.filter.AjaxLoginProcessingFilter;
+import io.security.corespringsecurity.security.handler.AjaxAccessDeniedHandler;
 import io.security.corespringsecurity.security.handler.AjaxAuthenticationFailureHandler;
 import io.security.corespringsecurity.security.handler.AjaxAuthenticationSuccessHandler;
 import io.security.corespringsecurity.security.provider.AjaxAuthenticationProvider;
@@ -31,11 +33,18 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .antMatcher("/api/**")
                 .authorizeRequests()
+                .antMatchers("/api/messages").hasRole("MANAGER")
                 .antMatchers("/api/login").permitAll()
                 .anyRequest().authenticated()
         .and()
                 .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
         ;
+        http
+        		.exceptionHandling()
+        		// 인증을 받지 않은 사용자가 자원에 접근했을 경우
+        		.authenticationEntryPoint(new AjaxLoginAuthenticationEntryPoint())
+        		// 인증을 받았지만 자원에 접근할 수 있는 자격이 없는 사용자가 접근했을 경우
+        		.accessDeniedHandler(ajaxAccessDeniedHandler());
 
         http.csrf().disable();
 
@@ -57,6 +66,11 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public AjaxAuthenticationFailureHandler ajaxAuthenticationFailureHandler(){
         return new AjaxAuthenticationFailureHandler();
+    }
+    
+    @Bean
+    public AjaxAccessDeniedHandler ajaxAccessDeniedHandler() {
+    	return new AjaxAccessDeniedHandler();
     }
     
     @Bean
