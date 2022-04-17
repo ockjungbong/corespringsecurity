@@ -10,6 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import io.security.corespringsecurity.security.common.FormWebAuthenticationDetails;
 import io.security.corespringsecurity.security.service.AccountContext;
 
 public class CustomAuthenticationProvider implements AuthenticationProvider {
@@ -31,10 +32,10 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("BadCredentialsException");
         }
 
-//        String secretKey = ((FormWebAuthenticationDetails) authentication.getDetails()).getSecretKey();
-//        if (secretKey == null || !secretKey.equals("secret")) {
-//            throw new InsufficientAuthenticationException("Invalid Secret");
-//        }
+        String secretKey = ((FormWebAuthenticationDetails) authentication.getDetails()).getSecretKey();
+        if (secretKey == null || !secretKey.equals("secret")) {
+            throw new InsufficientAuthenticationException("Invalid Secret");
+        }
 
         // 최종적으로 인증에 성공한 인증 객체를 만들어서 AuthenticationManager에게 리턴한다.
         UsernamePasswordAuthenticationToken authenticationToken 
