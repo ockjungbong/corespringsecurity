@@ -11,12 +11,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import io.security.corespringsecurity.domain.Account;
+
 @Controller
 public class LoginController {
-//	@GetMapping("/login")
-//	public String login() {
-//		return "user/login/login";
-//	}
+
 	
 	@GetMapping("/login")
     public String login(@RequestParam(value = "error", required = false) String error,
@@ -38,5 +37,16 @@ public class LoginController {
         }
         return "redirect:/login";
     }
+    
+    @GetMapping(value="/denied")
+	public String accessDenied(@RequestParam(value = "exception", required = false) String exception, Model model) throws Exception {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Account account = (Account) authentication.getPrincipal();
+		model.addAttribute("username", account.getUsername());
+		model.addAttribute("exception", exception);
+
+		return "user/login/denied";
+	}
 
 }
